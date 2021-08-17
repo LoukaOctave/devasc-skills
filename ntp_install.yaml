@@ -1,0 +1,34 @@
+---
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: INSTALL NTP
+      apt: name=ntp update_cache=yes state=latest
+
+    - name: VERIFY INSTALLATION
+      command: sntp --version
+      notify:
+        - RESTART NTP SERVER
+
+    - name: SET NTP SERVER POOLS
+      lineinfile:
+        dest: /etc/ntp.conf
+        regexp: '^pool .\.ubuntu\.pool\.ntp\.org'
+        line: '{{item.pool}}'
+        state: present
+      with_items:
+        - { pool: "server 3.europe.pool.ntp.org" }
+        - { pool: "server 2.europe.pool.ntp.org" }
+        - { pool: "server 1.europe.pool.ntp.org" }
+        - { pool: "server 0.europe.pool.ntp.org" }
+      notify:
+        - RESTART NTP SERVER
+
+  handlers:
+    - name: RESTART NTP SERVER
+      service: name=ntp state=restarted
+      notify:
+        - CHECK NTP SERVER STATUS
+
+    - name: CHECK NTP SERVER STATUS
+      command: service ntp status warn=false
