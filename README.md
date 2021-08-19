@@ -54,3 +54,27 @@ Verifying that everything worked as intended was pretty straightforward.
 * To make sure my container didn't just crash right away, I can run ```docker ps``` and see that it is still up and running. It also displays the exposed ports, and the ports they have been forwarded to.
 * Now comes the last step: I can either ```curl``` or browse to ```http://localhost:[forwarded_port]``` to see the Apache2 default page in HTML format.
 * Additionally, if I enter my container's shell, I can ```cat /etc/apache2/ports.conf``` and ```cat /etc/apache2/sites-available/000-default.conf``` to check that the correct port number has been set in both of these files.
+
+## Task 4 -- Webex Teams API
+### Task preparation
+A working virtual machine is needed with Python installed on it, along with a Webex Teams account and an API access token.
+### Task implementation
+1. For this task, I adapted a script from the course lab and named it ```create_room.py```. Here's what it does:
+    * It reads my access token from a file.
+    * It sends a POST request with the correct parameters to the API, in order to create a room with a chosen name.
+    * Depending on the success of that request, it displays different messages in the command line.
+    * On success, it keeps the room ID of the newly created room so it can be used when adding the user in the next step. It also writes a copy of this ID in to file, to be used in the next script (see below).
+    * It sends a POST request with the correct parameters to the API, in order to add a user based on a given email address.
+    * Depending on the success of that request, it displays different messages in the command line.
+2. I logged onto Webex Teams on my desktop and sent the URL to my repository in the room I had created earlier.
+3. For this task, I adapted a script from the course lab and named it ```send_message.py```. Here's what it does:
+    * It reads my access token and room ID from files.
+    * It sends a POST request with the correct parameters to the API, in order to post a given message in the room.
+    * Depending on the success of that request, it displays different messages in the command line.
+4. I logged onto Webex Teams on my desktop and uploaded the screenshots in the room I had created earlier.
+### Task troubleshooting
+I haven't encountered any major problems during the execution of this task.
+### Task verification
+There's different ways to verify the success of my scripts. For one, whenever a request is sent to the API, we get a response indicating its success. I make use of this in my script in order to display different messages for different status codes (200 OK or other).
+I could also send GET requests to the Webex Teams API in order to verify that the members and messages have been added to my newly created room.
+However, I simply opted to open Webex Teams on my desktop and check the room that way. As can be seen in the screenshot, I could verify and confirm that the task had been completed successfully.
