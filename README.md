@@ -33,6 +33,24 @@ A working virtual machine is needed with Ansible installed on it.
 In the playbook, I couldn't use the ```service``` module to output the ntp status, so I used ```command``` instead and added ```warn=false``` as an argument to hide warnings.
 ### Task verification
 After running the playbook with verbose, I get several indicators that the tasks were successfully completed (see screenshots).
-* VERIFY INSTALLATION does indeed display the version number for ntp on our machine, which means it is now present on our machine.
-* CHECK NTP SERVER STATUS shows ntp as active and running, which means it is working well.
-* PLAY RECAP shows no failed tasks, which means that none of the things we tried to do were unsuccessful.
+* ```VERIFY INSTALLATION``` does indeed display the version number for ntp on our machine, which means it is now present on it.
+* ```CHECK NTP SERVER STATUS``` shows ntp as active and running, which means it is as intended.
+* ```PLAY RECAP``` shows no failed tasks, which means that none of the things we tried to do were unsuccessful.
+
+## Task 3 -- Docker
+### Task preparation
+A working virtual machine is needed with Docker installed on it, along with a Docker ID.
+### Task implementation
+1. I wrote a Dockerfile that performs a configuration identical to the one in the Ansible playbook from an Ubuntu image that has the latest version of Apache2 installed onto it. In that Dockerfile I also ```EXPOSE``` the port number Apache is running on so that it can be accessed in our localhost.
+I then wrote a bash script that will create this Dockerfile, build an image of it, and run a container of that image; on any machine.
+2. The port that Apache will run on and that will be exposed from the container can be passed as an argument using ```--build-arg PORT=[number]```, because it is defined inside the Dockerfile with ```ARG```. Of course this is optional, as a default value of ```8081``` is already assigned to ```PORT``` in the Dockerfile.
+I made it so that our bash script can take an optional argument when executed from the command line, and that it feeds its value - if any exists - into our Dockerfile.
+3. I took a screenshot where you can see the code for my bash script along with a terminal window running the script, and a browser window showing the result of my work.
+### Task troubleshooting
+I've had some issues while trying to use ```CMD``` in my Dockerfile. I wanted to use it in order to (re)start Apache whenever I run a container of my image. Sadly, it only kept giving me errors so I ditched it. At that moment, I did discover that i did not really need it, because Apache starts up by itself when a container is created.
+### Task verification
+Verifying that everything worked as intended was pretty straightforward.
+* When running the bash script in the terminal, I can tell from the output that my Dockerfile is building an image and that a container is run as soon as that's done. The steps from the Dockerfile are displayed one by one, and then the container ID is shown.
+* To make sure my container didn't just crash right away, I can run ```docker ps``` and see that it is still up and running. It also displays the exposed ports, and the ports they have been forwarded to.
+* Now comes the last step: I can either ```curl``` or browse to ```http://localhost:[forwarded_port]``` to see the Apache2 default page in HTML format.
+* Additionally, if I enter my container's shell, I can ```cat /etc/apache2/ports.conf``` and ```cat /etc/apache2/sites-available/000-default.conf``` to check that the correct port number has been set in both of these files.

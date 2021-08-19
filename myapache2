@@ -1,0 +1,16 @@
+#!/bin/bash
+mkdir tempdir
+echo 'FROM ubuntu/apache2:latest' > tempdir/Dockerfile
+echo 'ARG PORT=8081' >> tempdir/Dockerfile
+echo 'RUN a2enmod rewrite' >> tempdir/Dockerfile
+echo 'RUN sed -i "s/^Listen 80/Listen $PORT/" /etc/apache2/ports.conf' >> tempdir/Dockerfile
+echo 'RUN sed -i "s/^<VirtualHost \*:80>/<VirtualHost *:$PORT>/" /etc/apache2/sites-available/000-default.conf' >> tempdir/Dockerfile
+echo 'EXPOSE $PORT' >> tempdir/Dockerfile
+cd tempdir
+if [ $1 ]
+then
+    docker build -t myapache2:latest . --build-arg PORT=$1
+else
+    docker build -t myapache2:latest .
+fi
+docker run -d -P myapache2
